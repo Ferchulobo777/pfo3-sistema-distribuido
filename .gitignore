@@ -1,0 +1,8 @@
+__pycache__/
+*.db
+venv/
+.venv/
+*.zip
+informe/
+pruebas/*.txt
+*.pdf

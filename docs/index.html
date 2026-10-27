@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PFO 3: Sistema Distribuido de Tareas</title>
+    <style>
+        body { font-family: "Times New Roman", serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; color: #222; }
+        h1, h2, h3 { line-height: 1.25; }
+        code, pre { background: #f2f2f2; border-radius: 4px; }
+        code { padding: 0.1em 0.35em; }
+        pre { padding: 0.8rem; overflow-x: auto; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; }
+        th { background: #f2f2f2; }
+        img { max-width: 100%; border: 1px solid #ccc; }
+        figure { margin: 1rem 0; }
+        figcaption { font-size: 0.9rem; color: #555; }
+    </style>
+</head>
+<body>
+    <h1>PFO 3: Rediseño como Sistema Distribuido (Cliente-Servidor)</h1>
+    <p>Programación sobre Redes, Tecnicatura Superior en Desarrollo de Software (IFTS N° 29)<br>
+    Alumno: Fernando Rodriguez · Código fuente: <a href="https://github.com/Ferchulobo777/pfo3-sistema-distribuido">github.com/Ferchulobo777/pfo3-sistema-distribuido</a></p>
+
+    <h2>Descripción</h2>
+    <p>Sistema de procesamiento de tareas con arquitectura distribuida sobre sockets TCP. Un servidor recibe tareas de varios clientes, las encola y las reparte entre workers independientes; cada worker resuelve varias tareas a la vez con su pool de hilos y el resultado vuelve al cliente que hizo el pedido.</p>
+
+    <h2>Diagrama del sistema</h2>
+    <figure>
+        <img src="diagramas/diagrama-sistema.png" alt="Diagrama del sistema distribuido">
+        <figcaption>Clientes, balanceador de carga (Nginx/HAProxy), servidores de tareas, RabbitMQ, workers con pool de hilos, PostgreSQL y S3.</figcaption>
+    </figure>
+
+    <h2>Implementación</h2>
+    <figure>
+        <img src="diagramas/diagrama-implementacion.png" alt="Diagrama de la implementación">
+        <figcaption>Procesos e hilos de la implementación en Python.</figcaption>
+    </figure>
+    <table>
+        <tr><th>En el diagrama</th><th>En el código</th></tr>
+        <tr><td>Cliente</td><td><code>cliente.py</code> (menú y modo <code>--demo</code>)</td></tr>
+        <tr><td>Servidor de tareas</td><td><code>servidor.py</code>: puerto 5000 para clientes y 5001 para workers</td></tr>
+        <tr><td>RabbitMQ</td><td><code>queue.Queue</code> dentro del servidor</td></tr>
+        <tr><td>Worker con pool de hilos</td><td><code>worker.py</code> con <code>ThreadPoolExecutor</code></td></tr>
+        <tr><td>PostgreSQL</td><td><code>tareas.db</code> (SQLite)</td></tr>
+    </table>
+
+    <h2>Ejecución</h2>
+<pre>python servidor.py
+python worker.py --nombre worker-1 --hilos 3
+python worker.py --nombre worker-2 --hilos 3
+python cliente.py          # o: python cliente.py --demo</pre>
+    <p>Solo usa la biblioteca estándar de Python 3.8 o superior.</p>
+
+    <h2>Pruebas</h2>
+    <p>19 pruebas de extremo a extremo con procesos reales (<code>python pruebas/prueba_sistema.py</code>): todas correctas.</p>
+    <figure><img src="capturas/03-cliente-demo.png" alt="Cliente en modo demo"><figcaption>12 tareas de 1 segundo resueltas en unos 2 segundos entre dos workers de 3 hilos.</figcaption></figure>
+    <figure><img src="capturas/05-falla-worker.png" alt="Falla de un worker"><figcaption>Se cae un worker con tareas en proceso: vuelven a la cola y las completa el otro.</figcaption></figure>
+    <figure><img src="capturas/07-pruebas.png" alt="Pruebas automatizadas"><figcaption>Resultado de las pruebas automatizadas.</figcaption></figure>
+    <p>El resto de las capturas y la documentación completa están en el <a href="https://github.com/Ferchulobo777/pfo3-sistema-distribuido#readme">README del repositorio</a>.</p>
+</body>
+</html>
