@@ -80,7 +80,7 @@ def nuevo_id():
         return f"T{next(contador_ids):04d}"
 
 
-# Persistencia ---------------------------------------------------------------
+# Persistencia
 
 def inicializar_bd():
     # Crea la tabla de tareas. En el diagrama este rol lo cumple PostgreSQL
@@ -122,7 +122,7 @@ def ahora():
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
-# Atención de clientes -------------------------------------------------------
+# Atención de clientes
 
 def recibir_tarea(cliente, mensaje):
     # Valida la tarea, la guarda como pendiente y la publica en la cola
@@ -175,7 +175,7 @@ def atender_cliente(sock, direccion):
         registrar(f"Cliente desconectado: {cliente.direccion}")
 
 
-# Atención de workers --------------------------------------------------------
+# Atención de workers
 
 def despachar(worker):
     # Hilo despachador de un worker: espera a que tenga un hilo libre, toma la
@@ -293,7 +293,7 @@ def atender_worker(sock, direccion):
         reencolar_tareas(worker)
 
 
-# Arranque -------------------------------------------------------------------
+# Arranque
 
 def crear_socket(puerto):
     # Sin SO_REUSEADDR: en Windows esa opción deja que dos procesos escuchen
